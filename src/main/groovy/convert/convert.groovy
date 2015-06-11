@@ -63,8 +63,8 @@ def sqlquery = """
           PI.INSURED_Zip AS PI_INSURED_Zip,
           PI.INSURED_PHONE_NO AS PI_INSURED_PHONE_NO,
           IN.INSURANCE_NAME AS IN_INSURANCE_NAME,
-	  IN.INSURANCE_PLAN_ID AS IN_INSURANCE_PLAN_ID,
-	  IN.INSURANCE_TYPE AS IN_INSURANCE_TYPE,
+          IN.INSURANCE_PLAN_ID AS IN_INSURANCE_PLAN_ID,
+          IN.INSURANCE_TYPE AS IN_INSURANCE_TYPE,
           IN.PK_ADDRESS_ID AS IN_PK_ADDRESS_ID,
           IN.Address1 AS IN_Address1,
           IN.Address2 AS IN_Address2,
@@ -81,13 +81,14 @@ def sqlquery = """
 """;
 
 // Get the column headings
+/*
 db.eachRow(sqlquery + " limit 1"){row->
   meta = row.getMetaData()
   numCols = meta.getColumnCount()
   headings = (1..numCols).collect{meta.getColumnLabel(it)}
   println headings.join(",")
 }
-
+*/
 /*
 // Execute a normal sql query on this table...
 db.eachRow(sqlquery){row->
@@ -97,4 +98,76 @@ db.eachRow(sqlquery){row->
   println vals.join(",")
 }
 */
+
+def headings = [
+"First",
+"Middle",
+"Last",
+"Suffix",
+"Email",
+"Cell Phone",
+"Home Phone",
+"Office Phone",
+"Office Phone Extension",
+"Street Address",
+"City",
+"State",
+"Zip Code",
+"Gender",
+"Date of Birth",
+"Social Security #",
+"Copay",
+"Primary Insurance",
+"Primary Insurance Plan Name",
+"Primary Insurance Id",
+"Primary Insurance Group #",
+"Primary Insurance Payer Id",
+"Secondary Insurance",
+"Secondary Insurance Plan Name",
+"Secondary Insurance Id",
+"Secondary Insurance Group #",
+"Secondary Insurance Payer Id",
+"Subscriber First",
+"Subscriber Middle",
+"Subscriber Last",
+"Subscriber Suffix",
+"Subscriber DOB",
+"Subscriber Social Security #",
+"Patient Relationship to Subscriber",
+"Secondary Subscriber First",
+"Secondary Subscriber Middle",
+"Secondary Subscriber Last",
+"Secondary Subscriber Suffix",
+"Secondary Subscriber DOB",
+"Secondary Subscriber Social Security #",
+"Patient Relationship to Secondary Subscriber",
+"Patient Student Status",
+"Employer",
+"Employer Phone",
+"Employer Zip Code",
+"Employer State",
+"Employer City",
+"Language",
+"Emergency Contact Name",
+"Emergency Contact Phone",
+"Signature On File",
+"Referring Dr.",
+"Referring Doctor NPI #",
+"Primary Care Physician",
+"Primarcy Care Physician NPI #",
+"Date of Last Appointment",
+"Date of next follow-up Appointment",
+"Follow-up Appointment Reason",
+"Notes"
+]
+
+println headings.join(",")
+
+db.eachRow(sqlquery + " limit 10"){row->
+ listWithVals = []
+ listWithVals.add(row["PA_FirstName"] ?: "")
+ listWithVals.add(row["PA_MiddleName"] ?: "")
+ listWithVals.add(row["PA_LastName"] ?: "")
+ println listWithVals.join(",")
+}
 
