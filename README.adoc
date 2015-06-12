@@ -1,0 +1,20 @@
+== convertToDrChrono
+convertToDrChrono is a groovy script for taking the patient demographic information exported by Puerto Rico's Inmediata 
+and generating a drchrono.com friendly csv bulk import file.
+
+=== What is needed to run the program
+
+The program expects a patients.csv file.  Create the patients.csv file by exporting the Patient_Demogprahics tab from the Inmediata excel export spreadsheet. 
+
+The program expects a insurance.csv file.  Create the insurance.csv file by exporting the Insurance_Payers tab from the Inmediata excel export spreadsheet. 
+
+The program expects a patient_insurance.csv file.  Create the patient_insurance.csv file by exporting the Patient_Insurance tab from the Inmediata excel export spreadsheet. 
+
+The program expects a exclude.csv.  This file you must generate.  It is a csv file with a minimum of one column.  The title of the required column must be PatientId and each row must contain the patient ids of the patients you DO NOT want in the final result.
+
+=== How to run
+.To get this project working, perform the minimum steps:
+----
+ $ gradlew createcsv
+----
+
