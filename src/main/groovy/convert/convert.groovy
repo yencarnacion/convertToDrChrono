@@ -41,7 +41,7 @@ def sqlquery = """
           PA.Language AS PA_Language,
           PA.HomePhone AS PA_HomePhone,
           PA.WorkPhone AS PA_WorkPhone,
-          PA.MobilePhone AS PA_WorkPhone,
+          PA.MobilePhone AS PA_MobilePhone,
           PA.Email AS PA_Email,
           PI.PATIENT_ID AS PI_PATIENT_ID,
           PI.INSURANCE_PLAN_ID AS PI_INSURANCE_PLAN_ID,
@@ -100,74 +100,148 @@ db.eachRow(sqlquery){row->
 */
 
 def headings = [
-"First",
-"Middle",
-"Last",
-"Suffix",
-"Email",
-"Cell Phone",
-"Home Phone",
-"Office Phone",
-"Office Phone Extension",
-"Street Address",
-"City",
-"State",
-"Zip Code",
-"Gender",
-"Date of Birth",
-"Social Security #",
-"Copay",
-"Primary Insurance",
-"Primary Insurance Plan Name",
-"Primary Insurance Id",
-"Primary Insurance Group #",
-"Primary Insurance Payer Id",
-"Secondary Insurance",
-"Secondary Insurance Plan Name",
-"Secondary Insurance Id",
-"Secondary Insurance Group #",
-"Secondary Insurance Payer Id",
-"Subscriber First",
-"Subscriber Middle",
-"Subscriber Last",
-"Subscriber Suffix",
-"Subscriber DOB",
-"Subscriber Social Security #",
-"Patient Relationship to Subscriber",
-"Secondary Subscriber First",
-"Secondary Subscriber Middle",
-"Secondary Subscriber Last",
-"Secondary Subscriber Suffix",
-"Secondary Subscriber DOB",
-"Secondary Subscriber Social Security #",
-"Patient Relationship to Secondary Subscriber",
-"Patient Student Status",
-"Employer",
-"Employer Phone",
-"Employer Zip Code",
-"Employer State",
-"Employer City",
-"Language",
-"Emergency Contact Name",
-"Emergency Contact Phone",
-"Signature On File",
-"Referring Dr.",
-"Referring Doctor NPI #",
-"Primary Care Physician",
-"Primarcy Care Physician NPI #",
-"Date of Last Appointment",
-"Date of next follow-up Appointment",
-"Follow-up Appointment Reason",
-"Notes"
+        "First",
+        "Middle",
+        "Last",
+        "Suffix",
+        "Email",
+        "Cell Phone",
+        "Home Phone",
+        "Office Phone",
+        "Office Phone Extension",
+        "Street Address",
+        "City",
+        "State",
+        "Zip Code",
+        "Gender",
+        "Date of Birth",
+        "Social Security #",
+        "Copay",
+        "Primary Insurance",
+        "Primary Insurance Plan Name",
+        "Primary Insurance Id",
+        "Primary Insurance Group #",
+        "Primary Insurance Payer Id",
+        "Secondary Insurance",
+        "Secondary Insurance Plan Name",
+        "Secondary Insurance Id",
+        "Secondary Insurance Group #",
+        "Secondary Insurance Payer Id",
+        "Subscriber First",
+        "Subscriber Middle",
+        "Subscriber Last",
+        "Subscriber Suffix",
+        "Subscriber DOB",
+        "Subscriber Social Security #",
+        "Patient Relationship to Subscriber",
+        "Secondary Subscriber First",
+        "Secondary Subscriber Middle",
+        "Secondary Subscriber Last",
+        "Secondary Subscriber Suffix",
+        "Secondary Subscriber DOB",
+        "Secondary Subscriber Social Security #",
+        "Patient Relationship to Secondary Subscriber",
+        "Patient Student Status",
+        "Employer",
+        "Employer Phone",
+        "Employer Zip Code",
+        "Employer State",
+        "Employer City",
+        "Language",
+        "Emergency Contact Name",
+        "Emergency Contact Phone",
+        "Signature On File",
+        "Referring Dr.",
+        "Referring Doctor NPI #",
+        "Primary Care Physician",
+        "Primarcy Care Physician NPI #",
+        "Date of Last Appointment",
+        "Date of next follow-up Appointment",
+        "Follow-up Appointment Reason",
+        "Notes"
 ]
 
 println headings.join(",")
 
-db.eachRow(sqlquery + " limit 10"){row->
- listWithVals = []
- listWithVals.add(row["PA_FirstName"] ?: "")
- listWithVals.add(row["PA_MiddleName"] ?: "")
- listWithVals.add(row["PA_LastName"] ?: "")
- println listWithVals.join(",")
+db.eachRow(sqlquery + " limit 25000"){row->
+    listWithVals = []
+    listWithVals.add(row["PA_FirstName"] ?: "")            // First
+    listWithVals.add(row["PA_MiddleName"] ?: "")           // Middle
+    listWithVals.add(row["PA_LastName"] ?: "")             // Last
+    listWithVals.add("")                                   // Suffix
+    listWithVals.add(row["PA_Email"] ?: "")                // Email
+    listWithVals.add(row["PA_MobilePhone"] ?: "")          // Cell Phone
+    listWithVals.add(row["PA_HomePhone"] ?: "")            // Home Phone
+    listWithVals.add(row["PA_WorkPhone"] ?: "")            // Office Phone
+    listWithVals.add("")                                   // Office Phone Extension
+    street = (row["PA_Address1"] ?: "")+' '+(row["PA_Address2"] ?: "")+' '+(row["PA_Address3"] ?: "")
+    listWithVals.add(street.trim())                        // Street Address
+    listWithVals.add(row["PA_City"] ?: "")                 // City
+    listWithVals.add(row["PA_State"] ?: "")                // State
+    listWithVals.add(row["PA_Zip"]?.substring(0,5) ?: "")  // Zip Code
+    listWithVals.add(row["PA_GENDER"] ?: "")               // Gender
+    listWithVals.add(row["PA_DOB"] ?: "")                  // Date of Birth
+    ssn = null
+    if(row["PA_SSN"]?.trim()) {
+        ssn = row["PA_SSN"].substring(0,3) + '-' + row["PA_SSN"].substring(3,5) + '-' + row["PA_SSN"].substring(5,9)
+    } else {
+        ssn = ""
+    }
+    listWithVals.add(ssn)                                  // Social Security #
+    listWithVals.add("")                                   // Copay
+    listWithVals.add(row["IN_INSURANCE_NAME"] ?: "")       // Primary Insurance
+    listWithVals.add(row["IN_INSURANCE_PLAN_ID"] ?: "")    // Primary Insurance Plan Name
+    listWithVals.add(row["PI_SUBSCRIBER_ID"] ?: "")        // Primary Insurance Id
+    listWithVals.add(row["PI_GROUP_NUMBER"] ?: "")         // Primary Insurance Group #
+    listWithVals.add(row["IN_PayerID"] ?: "")              // Primary Insurance Payer Id
+    listWithVals.add("")                                   // Secondary Insurance
+    listWithVals.add("")                                   // Secondary Insurance Plan Name
+    listWithVals.add("")                                   // Secondary Insurance Id
+    listWithVals.add("")                                   // Secondary Insurance Group #
+    listWithVals.add("")                                   // Secondary Insurance Payer Id
+
+    inname = row["PI_INSURED_NAME"]
+    inname = inname.replaceAll(/,$/, '')                   // Strip comma at end of name
+    namearray = inname.split(",")
+    listWithVals.add((namearray as List)[1]?.trim() ?: "")           // Subscriber First
+    listWithVals.add("")                                   // Subscriber Middle
+    listWithVals.add((namearray as List)[0]?.trim() ?: "")           // Subscriber Last
+    listWithVals.add("")                                   // Subscriber Suffix
+    listWithVals.add(row["PI_INSURED_DOB"] ?: "")          // Subscriber DOB
+    inssn = null
+    if(row["PI_INSURED_SSN"]?.trim() && row["PI_INSURED_SSN"].length() == 9) {
+        inssn = row["PI_INSURED_SSN"].substring(0,3) + '-' + row["PI_INSURED_SSN"].substring(3,5) + '-' + row["PI_INSURED_SSN"].substring(5,9)
+    } else {
+        inssn = ""
+    }
+    listWithVals.add(inssn)                                // Subscriber Social Security #
+    listWithVals.add(row["PI_RELATIONSHIP"] ?: "")         // Patient Relationship to Subscriber
+    listWithVals.add("")                                   // Secondary Subscriber First
+    listWithVals.add("")                                   // Secondary Subscriber Middle
+    listWithVals.add("")                                   // Secondary Subscriber Last
+    listWithVals.add("")                                   // Secondary Subscriber Suffix
+    listWithVals.add("")                                   // Secondary Subscriber DOB
+    listWithVals.add("")                                   // Secondary Subscriber Social Security #
+    listWithVals.add("")                                   // Patient Relationship to Secondary Subscriber
+    listWithVals.add("")                                   // Patient Student Status
+    listWithVals.add("")                                   // Employer
+    listWithVals.add("")                                   // Employer Phone
+    listWithVals.add("")                                   // Employer Zip Code
+    listWithVals.add("")                                   // Employer State
+    listWithVals.add("")                                   // Employer City
+    listWithVals.add(row["PA_Language"] ?: "")             // Language
+    listWithVals.add("")                                   // Emergency Contact Name
+    listWithVals.add("")                                   // Emergency Contact Phone
+    listWithVals.add("")                                   // Signature On File
+    listWithVals.add("")                                   // Referring Dr.
+    listWithVals.add("")                                   // Referring Doctor NPI #
+    listWithVals.add("")                                   // Primary Care Physician
+    listWithVals.add("")                                   // Primary Care Physician NPI #
+    listWithVals.add("")                                   // Date of Last Appointment
+    listWithVals.add("")                                   // Date of next follow-up Appointment
+    listWithVals.add("")                                   // Follow-up Appointment Reason
+    listWithVals.add("")                                   // Notes
+    println listWithVals.join(",")
+
 }
 
