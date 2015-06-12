@@ -18,6 +18,9 @@ db.execute("create table insurance as select * from csvread('/Users/yamir/Docume
 // Create a table from patient_insurance.csv file... 
 db.execute("create table patient_insurance as select * from csvread('/Users/yamir/Documents/clients/OficinaLopez/201506_Immediata/DataDemografica/tmp/patient_insurance.csv')")
 
+// Create a table from exclude.csv file...
+db.execute("create table exclud as select * from csvread('/Users/yamir/Documents/clients/OficinaLopez/201506_Immediata/DataDemografica/tmp/exclude.csv')")
+
 // Store the sql query in a variable
 def sqlquery = """
           SELECT 
@@ -78,6 +81,7 @@ def sqlquery = """
           FROM PATIENTS PA
           INNER JOIN PATIENT_INSURANCE PI ON PA.PatientID = PI.PATIENT_ID 
           INNER JOIN INSURANCE IN ON PI.INSURANCE_PLAN_ID = IN.INSURANCE_PLAN_ID
+          WHERE PA.PatientID NOT IN (SELECT PatientId FROM EXCLUD)
 """;
 
 // Get the column headings
@@ -241,7 +245,20 @@ db.eachRow(sqlquery + " limit 25000"){row->
     listWithVals.add("")                                   // Date of next follow-up Appointment
     listWithVals.add("")                                   // Follow-up Appointment Reason
     listWithVals.add("")                                   // Notes
-    println listWithVals.join(",")
+
+    // Print csv row quoting Columns containing commas
+    String line = "";
+    for(int i=0; i< listWithVals.size(); i++){
+        if((listWithVals[i] =~ /,/).count != 0) {
+            line = line + "\"" + listWithVals[i] + "\""
+        } else {
+            line = line + listWithVals[i]
+        }
+        if(i<(listWithVals.size()-1)){
+            line = line +","
+        }
+    }
+    println line
 
 }
 
